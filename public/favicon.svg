@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="12" fill="#14101a" />
+  <g fill="none" stroke="#e2c891" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- finial -->
+    <path d="M32 7v5" />
+    <!-- onion dome -->
+    <path d="M32 12c-7 5-10 10-10 15 0 5.5 4.5 9 10 9s10-3.5 10-9c0-5-3-10-10-15z" />
+    <!-- drum and body -->
+    <path d="M23.5 36h17v6h-17z" />
+    <path d="M20 42h24v13H20z" />
+    <!-- great arch -->
+    <path d="M32 46c-3 0-5 2.2-5 5v4h10v-4c0-2.8-2-5-5-5z" />
+    <!-- minarets -->
+    <path d="M13 40v15M51 40v15" />
+    <circle cx="13" cy="37.5" r="2.2" />
+    <circle cx="51" cy="37.5" r="2.2" />
+    <!-- plinth -->
+    <path d="M9 55h46" />
+  </g>
+</svg>
