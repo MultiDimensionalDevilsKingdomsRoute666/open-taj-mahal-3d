@@ -329,7 +329,16 @@ export function CharbaghGarden() {
       {/* --- raised marble tank at the crossing --- */}
       <mesh geometry={g.tankStep} position={[0, 0.27, TANK_Z]} material={mats.marbleFine} receiveShadow castShadow />
       <mesh geometry={g.tankRim} position={[0, 0.55, TANK_Z]} material={mats.marbleFloor} receiveShadow castShadow />
-      <ReflectingPool width={TANK_W - 0.4} length={TANK_D - 0.4} position={[0, 1.0, TANK_Z]} reflective />
+      {/* Each planar reflector costs a whole extra pass over the scene, so
+          Balanced spends its one reflection on the northern channel — the
+          view everybody actually photographs — and the tank falls back to
+          the environment map. */}
+      <ReflectingPool
+        width={TANK_W - 0.4}
+        length={TANK_D - 0.4}
+        position={[0, 1.0, TANK_Z]}
+        reflective={q.reflectorRes >= 512}
+      />
 
       <Fountains positions={fountainPositions} y={channelY + 0.05} />
 

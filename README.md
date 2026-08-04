@@ -141,16 +141,27 @@ or less.
 | --- | --- | --- | --- |
 | Device pixel ratio | 0.7–1 | 1–1.5 | 1–2 |
 | Shadow map | 1024 PCF | 2048 PCF soft | 4096 PCF soft |
-| Planar reflections | none | 1 @ 256 | 2 @ 512 |
+| Planar reflections | none | 1 @ 256 | 3 @ 512 |
 | Bloom | off | on | on |
 | Radial segments | 24 | 40 | 64 |
 | Garden trees | 90 | 190 | 300 |
 | Birds | 0 | 14 | 22 |
 
+Each planar reflection costs a full extra pass over the scene, so Balanced spends its one
+reflection on the northern channel — the view the whole composition is built around — and
+everything else falls back to the environment map.
+
+Measured on Balanced at 1920×794: **1362 draw calls and 629k triangles per frame**, across
+the main pass, the shadow pass and one reflection — roughly 450 draw calls per pass. Two
+changes account for most of that: instancing the eight columns and eight arches inside
+every chhatri (there are sixteen chhatris, so that alone is ~220 calls a frame), and
+dropping the second reflector from Balanced.
+
 Other measures: shared `BufferGeometry` across repeated architecture, instanced meshes for
 trees, fountains, blind arcading, minaret banding and the gate's chhatri row, a GPU wind
-shader so the foliage sways without touching the CPU, `AdaptiveDpr`, and explicit disposal
-of every generated texture, geometry and material when the experience unmounts.
+shader so the foliage sways without touching the CPU, `AdaptiveDpr`, no shadow casting on
+small decorative instances, and explicit disposal of every generated texture, geometry and
+material when the experience unmounts or the quality profile changes.
 
 Known cost: the whole scene is one ~1.4 MB JavaScript bundle (415 kB gzipped), dominated
 by Three.js. It is not code-split because nothing in it can be deferred past the first

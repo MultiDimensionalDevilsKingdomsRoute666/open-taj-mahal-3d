@@ -235,7 +235,6 @@ export function MarblePlatform() {
       <instancedMesh
         ref={terraceArcade}
         args={[g.blindArchSand, mats.sandstoneFine, arcades.terrace.length]}
-        castShadow
       />
       <mesh
         geometry={g.terraceCoping}
@@ -267,7 +266,6 @@ export function MarblePlatform() {
       <instancedMesh
         ref={plinthArcade}
         args={[g.blindArchMarble, mats.marbleFine, arcades.plinth.length]}
-        castShadow
       />
       <mesh
         geometry={g.plinthCoping}

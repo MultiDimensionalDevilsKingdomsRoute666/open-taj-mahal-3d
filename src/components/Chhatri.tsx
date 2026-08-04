@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import * as THREE from 'three'
 import { useScene } from './SceneContext'
 import { bulbProfile, columnProfile, lotusCollarProfile, pointedArch } from '../lib/shapes'
@@ -116,6 +116,42 @@ export function Chhatri({
     [radius],
   )
 
+  /* Callback refs so the transforms survive an InstancedMesh rebuild. */
+  const columnsRef = useCallback(
+    (mesh: THREE.InstancedMesh | null) => {
+      if (!mesh) return
+      const m = new THREE.Matrix4()
+      const p = new THREE.Vector3()
+      const qt = new THREE.Quaternion()
+      const one = new THREE.Vector3(1, 1, 1)
+      columns.forEach((c, i) => mesh.setMatrixAt(i, m.compose(p.set(c.x, 0.55, c.z), qt, one)))
+      mesh.instanceMatrix.needsUpdate = true
+      mesh.computeBoundingSphere()
+    },
+    [columns],
+  )
+
+  const archesRef = useCallback(
+    (mesh: THREE.InstancedMesh | null) => {
+      if (!mesh) return
+      const m = new THREE.Matrix4()
+      const p = new THREE.Vector3()
+      const qt = new THREE.Quaternion()
+      const e = new THREE.Euler()
+      const one = new THREE.Vector3(1, 1, 1)
+      const r = radius * Math.cos(Math.PI / 8)
+      columns.forEach((c, i) => {
+        const a = c.a + Math.PI / 8
+        e.set(0, a, 0)
+        p.set(Math.sin(a) * r, 0.55 + columnHeight * 0.55, Math.cos(a) * r)
+        mesh.setMatrixAt(i, m.compose(p, qt.setFromEuler(e), one))
+      })
+      mesh.instanceMatrix.needsUpdate = true
+      mesh.computeBoundingSphere()
+    },
+    [columns, radius, columnHeight],
+  )
+
   const canopyY = 0.55 + columnHeight
 
   return (
@@ -123,32 +159,11 @@ export function Chhatri({
       <mesh geometry={g.base} position={[0, 0.275, 0]} material={body} castShadow receiveShadow />
       <mesh geometry={g.plinth} position={[0, 0.7, 0]} material={trim} castShadow receiveShadow />
 
-      {columns.map((c) => (
-        <mesh
-          key={c.key}
-          geometry={g.column}
-          position={[c.x, 0.55, c.z]}
-          material={body}
-          castShadow
-          receiveShadow
-        />
-      ))}
-
-      {detail &&
-        columns.map((c) => {
-          const a = c.a + Math.PI / 8
-          const r = radius * Math.cos(Math.PI / 8)
-          return (
-            <mesh
-              key={`a${c.key}`}
-              geometry={g.arch}
-              position={[Math.sin(a) * r, 0.55 + columnHeight * 0.55, Math.cos(a) * r]}
-              rotation={[0, a, 0]}
-              material={body}
-              castShadow
-            />
-          )
-        })}
+      {/* Eight columns and eight spanning arches, two draw calls instead of
+          sixteen. There are sixteen chhatris across the complex, so this one
+          change is worth a couple of hundred draw calls a frame. */}
+      <instancedMesh ref={columnsRef} args={[g.column, body, 8]} castShadow receiveShadow />
+      {detail && <instancedMesh ref={archesRef} args={[g.arch, body, 8]} castShadow />}
 
       <mesh geometry={g.canopy} position={[0, canopyY + 0.25, 0]} material={body} castShadow receiveShadow />
       <mesh geometry={g.cornice} position={[0, canopyY + 0.68, 0]} material={trim} castShadow receiveShadow />
