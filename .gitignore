@@ -33,3 +33,5 @@ pnpm-debug.log*
 .cache
 .turbo
 tsconfig*.tsbuildinfo
+
+.vercel
